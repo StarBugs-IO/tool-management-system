@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.7%2B-green)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20iOS%20%7C%20Android-lightgrey)
 ![License](https://img.shields.io/badge/License-BSL_1.1-blue.svg)
 
 > ⚠️ **ЛИЦЕНЗИОННОЕ УВЕДОМЛЕНИЕ**: Этот проект защищен Business Source License 1.1
