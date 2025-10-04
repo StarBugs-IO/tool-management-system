@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест мобильного подключения</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>📱 Тест мобильного подключения</h1>
+    <div id="status"></div>
+    <button onclick="testConnection()">Проверить подключение</button>
+    
+    <script>
+        async function testConnection() {
+            const status = document.getElementById('status');
+            
+            try {
+                status.innerHTML = '<div class="status">🔄 Проверка подключения...</div>';
+                
+                const response = await fetch('/api/tools');
+                if (response.ok) {
+                    status.innerHTML = '<div class="status success">✅ Подключение успешно!</div>';
+                } else {
+                    status.innerHTML = '<div class="status error">❌ Ошибка API</div>';
+                }
+            } catch (error) {
+                status.innerHTML = '<div class="status error">❌ Ошибка сети: ' + error.message + '</div>';
+            }
+        }
+        
+        // Автопроверка при загрузке
+        testConnection();
+    </script>
+</body>
+</html>
