@@ -1,274 +1,428 @@
-/* Общие стили */
-body {
-    font-family: Arial, sans-serif;
+/* Black & White ASCII Art Style for Tool Management System - LIGHT THEME */
+/* ==================================================================== */
+
+/* Базовые стили ASCII */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    background-color: #f8f8f8;
+    color: #000000;
+    line-height: 1.4;
     min-height: 100vh;
+    padding: 10px;
+    background-image: 
+        radial-gradient(circle at 25% 25%, #e8e8e8 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, #e8e8e8 0%, transparent 50%);
+}
+
+/* Контейнер с ASCII-границей */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #333333;
+    position: relative;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ASCII заголовки */
+h1, h2, h3 {
+    color: #000000;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    font-size: 1.8em;
+    border-bottom: 1px solid #333333;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+h2 {
+    font-size: 1.4em;
+    border-bottom: 1px dashed #333333;
+    padding-bottom: 8px;
+    margin-bottom: 25px;
+}
+
+h3 {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+/* ASCII уведомления */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border: 1px solid #333333;
+    background: #ffffff;
+    color: #000000;
+    z-index: 1000;
+    display: none;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.notification.error {
+    border-color: #666666;
+    color: #666666;
+    background: #f0f0f0;
+    box-shadow: 0 0 15px rgba(102, 102, 102, 0.3);
+}
+
+/* ASCII формы */
+#toolForm {
+    background: #f8f8f8;
+    border: 1px solid #333333;
+    padding: 20px;
+    margin-bottom: 30px;
     position: relative;
 }
 
-.container {
-    max-width: 1200px;
-    width: 100%;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 80vh;
-}
-
-h1, h2 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* Стили для формы */
-form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    position: static;
-}
-
-/* Прилипание формы только для десктопов и планшетов */
-@media (min-width: 769px) {
-    form {
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
+#toolForm::before {
+    content: '[ ФОРМА ДОБАВЛЕНИЯ ]';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #ffffff;
+    padding: 0 10px;
+    font-size: 0.9em;
+    color: #333333;
 }
 
 .form-row {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr auto;
     gap: 10px;
-    flex-wrap: wrap;
+    align-items: end;
 }
 
-.form-row select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    flex: 1;
-    background-color: #fff;
-    color: #333;
-    transition: border-color 0.3s ease;
-}
-
-.form-row select:focus {
-    border-color: #28a745;
+/* ASCII селекты и инпуты */
+select, input, button {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #333333;
+    padding: 8px 12px;
     outline: none;
+    transition: all 0.3s ease;
 }
 
-.form-row select:disabled {
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 30px;
+}
+
+select:focus, input:focus {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-color: #000000;
+}
+
+select:disabled {
+    color: #888888;
+    border-color: #888888;
     background-color: #f0f0f0;
-    color: #999;
 }
 
-.form-row button {
+/* ASCII кнопки */
+button {
+    background: #f8f8f8;
+    color: #000000;
+    border: 1px solid #333333;
     padding: 10px 20px;
-    background-color: #000;
-    color: white;
-    border: 2px solid white;
-    border-radius: 4px;
-    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
 }
 
-.form-row button:hover {
-    background-color: #333;
-    border-color: #fff;
+button:hover {
+    background: #333333;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Стили для таблицы */
+button:active {
+    transform: translateY(1px);
+}
+
+/* ASCII таблицы */
 .table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    padding: 0px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    margin-left: 0;
-    padding-left: 2px;
-    background-color: transparent;
-    min-height: 400px;
-    margin-top: 20px;
-    flex: 1;
+    background: #f8f8f8;
+    border: 1px solid #333333;
+    padding: 20px;
+    position: relative;
 }
 
-#toolTable {
-    width: 100%;
-    max-width: 1000px;
-    margin-top: 0px;
-    margin-left: 0;
-    padding-left: 0;
-    background-color: transparent;
-    min-height: 300px;
+.table-wrapper::before {
+    content: '[ СПИСОК ИНСТРУМЕНТОВ ]';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #ffffff;
+    padding: 0 10px;
+    font-size: 0.9em;
+    color: #333333;
 }
 
-/* Стили для блока станка */
 .station-block {
-    margin-bottom: 20px;
-    margin-left: 0;
-    padding-left: 0;
-    background-color: transparent;
+    margin-bottom: 25px;
+    border: 1px solid #333333;
+    background: #ffffff;
 }
 
 .station-name {
-    background-color: #f8f9fa;
-    padding: 12px;
+    background: #f0f0f0;
+    padding: 12px 15px;
     font-weight: bold;
-    border-bottom: 1px solid #ddd;
-    margin-left: 0;
-    padding-left: 5px;
-    border-radius: 5px;
-    margin-top: 20px;
+    border-bottom: 1px solid #333333;
+    color: #000000;
 }
 
 .station-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
-    margin-left: 0;
-    padding-left: 0;
-    background-color: transparent;
-}
-
-.station-table th, .station-table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    word-wrap: break-word;
     font-size: 14px;
-    white-space: nowrap;
 }
 
 .station-table th {
-    background-color: #f8f9fa;
+    background: #e8e8e8;
+    padding: 12px 8px;
+    text-align: left;
+    border-bottom: 1px solid #333333;
+    color: #000000;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.station-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #cccccc;
+    color: #000000;
+}
+
+.station-table tr:hover {
+    background: #f0f0f0;
+}
+
+.station-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Специфичные стили для ячеек таблицы */
+.tool-type {
     font-weight: bold;
 }
 
-.station-table td a {
-    color: #dc3545;
-    text-decoration: none;
-    transition: color 0.3s ease;
+.tool-size {
+    background: #f8f8f8;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    border: 1px solid #dddddd;
 }
 
-.station-table td a:hover {
-    color: #c82333;
-}
-
-/* Стили для уведомлений */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px;
-    border-radius: 5px;
-    color: white;
-    background-color: #28a745;
-    display: none;
-    z-index: 1000;
-    animation: fadeIn 0.5s ease;
-}
-
-.notification.error {
-    background-color: #dc3545;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Стили для футера */
-.main-footer {
-    margin-top: 40px;
-    padding: 20px 0;
-    border-top: 1px solid #e9ecef;
-    text-align: center;
-}
-
-.footer-content {
-    color: #6c757d;
-    font-size: 14px;
-}
-
-.footer-content a {
-    color: #007bff;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-content a:hover {
-    color: #0056b3;
-    text-decoration: underline;
-}
-
-/* Сообщение об отсутствии данных */
-.no-data-message {
-    text-align: center;
-    padding: 40px;
-    color: #666;
+.cell-info, .date-info {
+    color: #666666;
     font-style: italic;
 }
 
-/* Адаптивные стили для мобильных устройств */
+.delete-btn {
+    background: #f8f8f8;
+    color: #000000;
+    border: 1px solid #333333;
+    padding: 6px 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.delete-btn:hover {
+    background: #333333;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Сообщение об отсутствии данных */
+.no-tools {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888888;
+    font-style: italic;
+    background: #f8f8f8;
+    border: 1px dashed #cccccc;
+}
+
+.no-tools div:first-child {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+/* ASCII футер */
+.main-footer {
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 1px solid #333333;
+    text-align: center;
+    color: #666666;
+    font-size: 14px;
+}
+
+.main-footer a {
+    color: #000000;
+    text-decoration: none;
+    border-bottom: 1px dotted #000000;
+}
+
+.main-footer a:hover {
+    color: #000000;
+    border-bottom: 1px solid #000000;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* ASCII анимации */
+@keyframes terminalBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.terminal-cursor {
+    animation: terminalBlink 1s infinite;
+}
+
+/* ASCII эффекты для фокуса */
+select:focus, input:focus, button:focus {
+    animation: terminalBlink 0.6s ease;
+}
+
+/* Адаптивность для ASCII стиля */
 @media (max-width: 768px) {
-    .form-row {
-        flex-direction: column;
-        align-items: stretch;
+    body {
+        padding: 5px;
+        font-size: 12px;
     }
-
-    .form-row select, .form-row button {
-        width: 100%;
-    }
-
-    .station-table th, .station-table td {
+    
+    .container {
         padding: 10px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .station-table {
         font-size: 12px;
     }
-
-    .station-table th {
-        font-size: 12px;
+    
+    .station-table th,
+    .station-table td {
+        padding: 8px 4px;
     }
-
-    .notification {
-        top: 10px;
-        right: 10px;
-        font-size: 14px;
+    
+    h1 {
+        font-size: 1.4em;
     }
-
-    form {
-        position: static;
+    
+    h2 {
+        font-size: 1.2em;
     }
+}
 
-    .main-footer {
-        margin-top: 20px;
-        padding: 15px 0;
-    }
+/* Специальные ASCII классы */
+.ascii-border {
+    border: 1px solid #333333;
+    padding: 15px;
+    margin: 10px 0;
+    background: #f8f8f8;
+    position: relative;
+}
 
-    .footer-content {
-        font-size: 12px;
-    }
+.ascii-border::before {
+    content: '[ ' attr(data-title) ' ]';
+    position: absolute;
+    top: -10px;
+    left: 15px;
+    background: #ffffff;
+    padding: 0 8px;
+    font-size: 0.8em;
+    color: #333333;
+}
+
+.ascii-prompt::before {
+    content: "> ";
+    color: #000000;
+    font-weight: bold;
+}
+
+.ascii-success {
+    color: #000000;
+    border-left: 2px solid #000000;
+    padding-left: 10px;
+}
+
+.ascii-error {
+    color: #666666;
+    border-left: 2px solid #666666;
+    padding-left: 10px;
+}
+
+.ascii-warning {
+    color: #444444;
+    border-left: 2px solid #444444;
+    padding-left: 10px;
+}
+
+/* ASCII иконки через псевдоэлементы */
+.tool-type::before {
+    content: "⚙ ";
+}
+
+.cell-info::before {
+    content: "📍 ";
+}
+
+.date-info::before {
+    content: "🕐 ";
+}
+
+.station-name::before {
+    content: "🏭 ";
+}
+
+/* ASCII скроллбар */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #000000;
 }
