@@ -1,67 +1,64 @@
 @echo off
-chcp 65001
+chcp 65001 >nul
 title Tool Management System Server
 cd /d "%~dp0"
 
 echo.
 echo ========================================
-echo    СИСТЕМА УПРАВЛЕНИЯ ИНСТРУМЕНТАМИ
+echo    TOOL MANAGEMENT SYSTEM
 echo ========================================
 echo.
 
-:: Проверяем Python
+:: Check Python
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ ОШИБКА: Python не установлен!
+    echo ERROR: Python not found!
     echo.
-    echo Установите Python с python.org
-    echo Обязательно отметьте "Add Python to PATH"
+    echo Install Python from python.org
+    echo Make sure to check "Add Python to PATH"
     echo.
     pause
     exit /b 1
 )
 
-echo ✅ Python обнаружен
+echo OK: Python found
 echo.
 
-:: Получаем и показываем IP адреса
-echo 📡 Поиск сетевых адресов...
-echo.
-
+:: Show network addresses
+echo Network addresses:
 setlocal enabledelayedexpansion
-set ip_count=0
+set count=0
 
 for /f "tokens=2 delims=:" %%i in ('ipconfig ^| findstr "IPv4"') do (
-    set /a ip_count+=1
+    set /a count+=1
     set "ip=%%i"
     set "ip=!ip: =!"
-    echo 📍 Адрес !ip_count!: http://!ip!:8000
+    echo   http://!ip!:8000
 )
 
 echo.
-if !ip_count! == 0 (
-    echo ⚠️  Сетевые адреса не найдены
-    echo    Проверьте подключение к сети
+if !count! == 0 (
+    echo Warning: No network addresses found
+    echo Check network connection
 ) else (
-    echo 📱 Для подключения других устройств
-    echo    используйте любой из адресов выше
+    echo For other devices use any address above
 )
 
 echo.
-echo 🚀 Запуск сервера...
-echo ⏹️  Для остановки нажмите Ctrl+C
+echo Starting server...
+echo Press Ctrl+C to stop
 echo.
 
-:: Запускаем сервер
+:: Start server
 python server.py
 
 if errorlevel 1 (
     echo.
-    echo ❌ Ошибка запуска сервера!
+    echo ERROR: Server startup failed
     echo.
     pause
 )
 
 echo.
-echo Сервер остановлен.
+echo Server stopped.
 pause
