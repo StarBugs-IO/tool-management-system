@@ -15,18 +15,12 @@
                 <li><a href="#dashboard" class="active">📊 Дашборд</a></li>
                 <li><a href="#machines">🏭 Станки</a></li>
                 <li><a href="#tools">🔧 Типы инструментов</a></li>
-                <li><a href="#users">👥 Пользователи</a></li>
-                <li><a href="#reports">📈 Отчеты</a></li>
-                <li><a href="#settings">⚙️ Настройки</a></li>
                 <li><a href="../index.html">← На главную</a></li>
             </ul>
         </nav>
 
         <!-- Основной контент -->
         <main class="admin-content">
-            <!-- Уведомления -->
-            <div id="notification" class="notification"></div>
-
             <!-- Раздел Дашборд -->
             <div id="dashboard" class="admin-section active">
                 <h1>📊 Дашборд</h1>
@@ -63,7 +57,9 @@
                     <h1>🏭 Управление станками</h1>
                     <button class="btn-primary" onclick="showAddMachineModal()">+ Добавить станок</button>
                 </div>
-                <div id="machinesList" class="items-list"></div>
+                <div id="machinesList" class="items-list">
+                    <!-- Список станков будет загружен через JS -->
+                </div>
             </div>
 
             <!-- Раздел Типы инструментов -->
@@ -72,57 +68,10 @@
                     <h1>🔧 Типы инструментов</h1>
                     <button class="btn-primary" onclick="showAddToolTypeModal()">+ Добавить тип</button>
                 </div>
-                <div id="toolTypesList" class="items-list"></div>
-            </div>
-
-            <!-- Раздел Пользователи -->
-            <div id="users" class="admin-section">
-                <h1>👥 Управление пользователями</h1>
-                <div class="users-list">
-                    <div class="user-card">
-                        <h3>Администратор</h3>
-                        <p>Роль: Админ</p>
-                        <p>Email: admin@company.com</p>
-                        <button class="btn-secondary">Редактировать</button>
-                    </div>
+                <div id="toolTypesList" class="items-list">
+                    <!-- Список типов инструментов будет загружен через JS -->
                 </div>
             </div>
-
-            <!-- Раздел Отчеты -->
-            <div id="reports" class="admin-section">
-                <h1>📈 Отчеты и аналитика</h1>
-                <div class="reports-grid">
-                    <button class="report-card" onclick="generateUsageReport()">
-                        <h3>Отчет по использованию</h3>
-                        <p>Статистика использования инструментов</p>
-                    </button>
-                    <button class="report-card" onclick="generateInventoryReport()">
-                        <h3>Инвентаризация</h3>
-                        <p>Полный список инструментов</p>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Раздел Настройки -->
-            <div id="settings" class="admin-section">
-                <h1>⚙️ Настройки системы</h1>
-                <div class="settings-grid">
-                    <div class="setting-card">
-                        <h3>Резервное копирование</h3>
-                        <button class="btn-secondary" onclick="backupData()">Создать backup</button>
-                        <button class="btn-secondary" onclick="restoreData()">Восстановить</button>
-                    </div>
-                    <div class="setting-card">
-                        <h3>Очистка данных</h3>
-                        <button class="btn-danger" onclick="clearAllData()">Очистить все данные</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Футер -->
-            <footer class="admin-footer">
-                <p>&copy; 2024 Система управления инструментами. <a href="../index.html">Вернуться на главную</a></p>
-            </footer>
         </main>
     </div>
 
@@ -164,6 +113,8 @@
         </div>
     </div>
 
+    <!-- Подключаем database.js ПЕРВЫМ -->
+    <script src="../database.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
