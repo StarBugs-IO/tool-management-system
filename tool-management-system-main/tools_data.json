@@ -1,0 +1,51 @@
+[
+  {
+    "machine": "KVL-1260A",
+    "toolType": "Фреза",
+    "toolSize": "10.0",
+    "cellNumber": "10",
+    "dateAdded": "2025-10-05T09:35:40.843Z"
+  },
+  {
+    "machine": "KVL-1260A",
+    "toolType": "Сверло",
+    "toolSize": "5",
+    "cellNumber": "5",
+    "dateAdded": "2025-10-05T09:36:02.883Z"
+  },
+  {
+    "machine": "KVL-1260A",
+    "toolType": "Сверло",
+    "toolSize": "9",
+    "cellNumber": "9",
+    "dateAdded": "2025-10-05T09:36:17.075Z"
+  },
+  {
+    "machine": "KVL-1260A",
+    "toolType": "Центровка",
+    "toolSize": "",
+    "cellNumber": "3",
+    "dateAdded": "2025-10-05T09:36:32.155Z"
+  },
+  {
+    "machine": "KVL-1361A",
+    "toolType": "Фреза",
+    "toolSize": "6.0",
+    "cellNumber": "6",
+    "dateAdded": "2025-10-05T09:38:55.656Z"
+  },
+  {
+    "machine": "KVL-1260A",
+    "toolType": "Фреза",
+    "toolSize": "20",
+    "cellNumber": "20",
+    "dateAdded": "2025-10-05T10:04:02.867Z"
+  },
+  {
+    "machine": "ТСЗ-Ф13-70",
+    "toolType": "Фреза",
+    "toolSize": "30",
+    "cellNumber": "15",
+    "dateAdded": "2025-10-05T10:12:43.739Z"
+  }
+]
