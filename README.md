@@ -279,8 +279,7 @@ tool-management-system/
 
 ### 🚀 Готовы автоматизировать учет инструментов?
 
-[Скачать бесплатную версию](https://github.com/StarBugs-IO/tool-management-system/archive/main.zip) • 
-[Запросить коммерческую лицензию](mailto:odin_za_vseh@icloud.com) • 
+[Скачать бесплатную версию](https://github.com/StarBugs-IO/tool-management-system/archive/main.zip)  • 
 [Посмотреть код](https://github.com/StarBugs-IO/tool-management-system)
 
 **⭐ Поставьте звезду на GitHub, если проект вам полезен!**
