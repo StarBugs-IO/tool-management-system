@@ -1,13 +1,11 @@
 # 🛠️ Tool Management System
 
 <p align="center">
-  <a href="https://github.com/sponsors/StarBugs-IO">
-    <img src="https://img.shields.io/badge/Sponsor-Project-%23EA4AAA?style=for-the-badge&logo=githubsponsors" alt="Sponsor on GitHub">
-  </a>
-  <a href="https://www.buymeacoffee.com/yourusername">
-    <img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee">
+      <a href="https://yoomoney.ru/to/410011XXXXXXXXX">
+    <img src="https://img.shields.io/badge/Поддержать_проект-ЮMoney-8B35B9?style=for-the-badge&logo=yandex&logoColor=white" alt="Поддержать через ЮMoney">
   </a>
 </p>
+
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.7%2B-green)
@@ -206,6 +204,23 @@ tool-management-system/
 - Резервные копии на ваших носителях
 
 ## 🆘 Поддержка и помощь
+
+Этот проект разрабатывается в свободное время. Если он вам полезен, рассмотрите возможность поддержки!
+
+### Способы поддержки:
+
+| Платформа | Ссылка | Описание |
+|-----------|--------|----------|
+| **ЮMoney** | [Поддержать](https://yoomoney.ru/to/410011XXXXXXXXX) | Основной способ для РФ |
+
+### Что даст ваша поддержка:
+- 🕐 Больше времени на разработку
+- 🐛 Быстрое исправление багов  
+- 🚀 Реализация новых функций
+- 📚 Создание документации и примеров
+
+## Спонсоры
+
 
 ### 📚 Документация:
 - [Инструкция по установке] Скопируйте репозиторий. Запустите start-server.bat
