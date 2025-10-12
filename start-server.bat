@@ -50,7 +50,7 @@ echo Press Ctrl+C to stop
 echo.
 
 :: Start server
-python server.py
+python dist/server.py
 
 if errorlevel 1 (
     echo.
