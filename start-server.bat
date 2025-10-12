@@ -49,8 +49,9 @@ echo Starting server...
 echo Press Ctrl+C to stop
 echo.
 
-:: Start server
-python dist/server.py
+:: Change to dist directory and start server
+cd dist
+python server.py
 
 if errorlevel 1 (
     echo.
