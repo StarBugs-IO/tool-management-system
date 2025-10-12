@@ -10,8 +10,26 @@ class AdminPanel {
             document.addEventListener('DOMContentLoaded', () => this.init());
         } else {
             this.init();
+            this.updateGitHubStars();
         }
     }
+
+// Добавьте метод:
+async updateGitHubStars() {
+    try {
+        const response = await fetch('https://api.github.com/repos/StarBugs-IO/tool-management-system');
+        if (response.ok) {
+            const repoData = await response.json();
+            const stars = repoData.stargazers_count;
+            const starsElement = document.getElementById('githubStars');
+            if (starsElement) {
+                starsElement.textContent = stars;
+            }
+        }
+    } catch (error) {
+        console.log('Не удалось получить данные GitHub');
+    }
+}
 
     getDatabase() {
         if (typeof window.toolDatabase !== 'undefined') {
@@ -530,3 +548,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log('Admin Panel script loaded');
+

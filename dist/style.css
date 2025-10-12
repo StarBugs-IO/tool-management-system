@@ -1114,3 +1114,93 @@ textarea {
         gap: 5px;
     }
 }
+
+
+/* Стили для ссылок в футере */
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Стили для GitHub ссылки */
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #000000;
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid #333333;
+    background: #f8f8f8;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.github-link:hover {
+    background: #333333;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.github-link svg {
+    flex-shrink: 0;
+}
+
+.github-stars {
+    background: #e8e8e8;
+    padding: 1px 6px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+/* Стили для ссылки поддержки */
+.donate-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #666666;
+    text-decoration: none;
+    padding: 4px 10px;
+    border: 1px solid #666666;
+    background: #f8f8f8;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.donate-link:hover {
+    background: #666666;
+    color: #ffffff;
+    opacity: 1;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .footer-links {
+        justify-content: center;
+    }
+    
+    .github-link, .donate-link {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+}

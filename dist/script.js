@@ -646,3 +646,39 @@ function showNotification(message, isError = false) {
         notification.style.display = 'none';
     }, 2000);
 }
+
+// Добавьте в конец файла script.js
+
+// Функция для получения количества звезд GitHub
+async function updateGitHubStars() {
+    try {
+        const response = await fetch('https://api.github.com/repos/StarBugs-IO/tool-management-system');
+        if (response.ok) {
+            const repoData = await response.json();
+            const stars = repoData.stargazers_count;
+            const starsElement = document.getElementById('githubStars');
+            if (starsElement) {
+                starsElement.textContent = stars;
+            }
+        }
+    } catch (error) {
+        console.log('Не удалось получить данные GitHub');
+    }
+}
+
+// Обновите функцию initializeApp():
+async function initializeApp() {
+    await loadDataFromServer();
+    setupEventListeners();
+    
+    // Для мобильных устройств используем только ручное обновление
+    if (!isMobileDevice) {
+        startRealTimeSync();
+    }
+    
+    restoreFormState();
+    updateConnectionInfo();
+    
+    // Обновляем звезды GitHub
+    updateGitHubStars();
+}
