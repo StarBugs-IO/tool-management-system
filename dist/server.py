@@ -83,6 +83,11 @@ def get_ip_address():
         return "localhost"
 
 class ToolHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        # Указываем директорию с файлами
+        self.directory = 'dist'
+        super().__init__(*args, directory=self.directory, **kwargs)
+    
     def is_host_client(self):
         """Проверяет, является ли клиент хостом (localhost)"""
         client_ip = self.client_address[0]
@@ -182,7 +187,7 @@ class ToolHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({'status': 'ok', 'timestamp': time.time()}).encode())
                 return
                     
-            # Обработка статических файлов
+            # Обработка статических файлов - перенаправляем в dist/
             if path == '/':
                 self.path = '/index.html'
             elif path == '/admin':
@@ -191,6 +196,9 @@ class ToolHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_error(403, "Доступ запрещен. Админ-панель доступна только с хостового устройства")
                     return
                 self.path = '/admin/index.html'
+            elif path.startswith('/admin/'):
+                # Для админ-панели файлы тоже в dist/admin/
+                pass
             
             return super().do_GET()
             
@@ -307,7 +315,7 @@ load_data()
 PORT = 8000
 server_ip = get_ip_address()
 
-print("=" * 50)
+print("=" * 51)
 print("🚀 СИСТЕМА УПРАВЛЕНИЯ ИНСТРУМЕНТАМИ")
 print("=" * 50)
 print(f"📍 Локальный: http://localhost:{PORT}")
@@ -330,6 +338,7 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
 
 try:
+    # Запускаем сервер из текущей директории (где находится server.py)
     with ThreadedTCPServer(("", PORT), ToolHandler) as httpd:
         print(f"🎯 Сервер запущен на порту {PORT}")
         print("⏹️  Остановка: Ctrl+C")
