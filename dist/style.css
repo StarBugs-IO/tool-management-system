@@ -110,6 +110,76 @@ h3 {
     align-items: end;
 }
 
+
+/* Стили для поля ввода размера инструмента */
+#toolSize {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #333333;
+    padding: 8px 12px;
+    outline: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 38px; /* Такая же высота как у выпадающих списков */
+    box-sizing: border-box; 
+    line-height: 1.2; /* Добавляем line-height для правильного отображения текста */
+}
+
+#toolSize:focus {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-color: #000000;
+}
+
+#toolSize::placeholder {
+    color: #888888;
+    font-style: italic;
+}
+
+
+.form-row select,
+.form-row input,
+.form-row button {
+    height: 38px; /* Единая высота для всех элементов формы */
+    box-sizing: border-box; /* Единый расчет размеров */
+    line-height: 1.2; /* Единый line-height для всех элементов */
+}
+
+
+.form-row select {
+    padding: 8px 30px 8px 12px; /* Увеличиваем padding снизу и сверху */
+    line-height: 1.4; /* Увеличиваем line-height для лучшего отображения текста */
+}
+
+/* Стили для текста внутри выпадающих списков */
+.form-row select option {
+    padding: 8px 12px; /* Добавляем padding для опций */
+    line-height: 1.4; /* Увеличиваем line-height для опций */
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    #toolSize {
+        font-size: 16px; /* Предотвращает масштабирование в iOS */
+        padding: 12px;
+        height: 44px; /* Увеличиваем высоту для мобильных */
+        line-height: 1.3; /* Увеличиваем line-height для мобильных */
+    }
+    
+    .form-row select,
+    .form-row input,
+    .form-row button {
+        height: 44px; /* Единая высота для мобильных */
+        line-height: 1.3; /* Увеличиваем line-height для мобильных */
+    }
+    
+    .form-row select {
+        padding: 10px 35px 10px 15px; /* Увеличиваем padding для мобильных */
+        line-height: 1.5;
+    }
+}
+
 /* ASCII селекты и инпуты */
 select, input, button {
     font-family: 'Courier New', monospace;
@@ -903,7 +973,6 @@ textarea {
     border: 1px dashed #cccccc;
 }
 
-/* Добавляем в конец файла style.css */
 
 /* Стили для строки заголовка таблицы */
 .table-header-row {
@@ -1044,7 +1113,6 @@ textarea {
     }
 }
 
-/* Добавляем в конец файла style.css */
 
 /* Бейдж для мобильных устройств */
 .mobile-badge {

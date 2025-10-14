@@ -40,13 +40,17 @@ async function initializeApp() {
     
     restoreFormState();
     updateConnectionInfo();
+    updateInterface();
+    
+    // Обновляем звезды GitHub
+    updateGitHubStars();
 }
 
 function setupEventListeners() {
     const toolForm = document.getElementById('toolForm');
     const toolTypeSelect = document.getElementById('toolType');
     const machineSelect = document.getElementById('machine');
-    const toolSizeSelect = document.getElementById('toolSize');
+    const toolSizeInput = document.getElementById('toolSize');
     const cellNumberSelect = document.getElementById('cellNumber');
     
     // Сохраняем состояние выпадающих списков при изменении
@@ -63,7 +67,7 @@ function setupEventListeners() {
         updateToolSizeSelect();
     });
 
-    toolSizeSelect.addEventListener('change', function() {
+    toolSizeInput.addEventListener('input', function() {
         formState.toolSize = this.value;
         selectStates.toolSize = this.value;
     });
@@ -101,6 +105,53 @@ function restoreFormState() {
     }
 }
 
+// Функция валидации размера инструмента
+function validateToolSize(toolType, toolSize) {
+    if (!toolSize || toolSize.trim() === '') {
+        return { isValid: true, value: '' }; // Пустое значение допустимо
+    }
+    
+    const size = toolSize.trim();
+    
+    // Базовая валидация - запрещаем специальные символы кроме буквы M, цифр, точек и дефисов
+    const invalidChars = /[^a-zA-Z0-9Мм\.\-\s]/;
+    if (invalidChars.test(size)) {
+        return { 
+            isValid: false, 
+            message: 'Недопустимые символы в размере. Разрешены только буквы, цифры, точки и дефисы.' 
+        };
+    }
+    
+    // Упрощенная валидация по типам инструментов
+    if (toolType && size) {
+        const lowerType = toolType.toLowerCase();
+        const lowerSize = size.toLowerCase();
+        
+        // Для резьбофрез добавляем автоматическую букву М если её нет
+        if (lowerType.includes('резьб') || lowerType.includes('thread')) {
+            if (!lowerSize.startsWith('м') && !lowerSize.startsWith('m')) {
+                return { 
+                    isValid: true, 
+                    value: 'M' + size.toUpperCase(),
+                    message: 'Автоматически добавлена буква M к размеру'
+                };
+            }
+        }
+        
+        // Для фрез и сверл проверяем числовой формат
+        if ((lowerType.includes('фрез') || lowerType.includes('mill') || 
+             lowerType.includes('сверл') || lowerType.includes('drill')) && 
+            !/^[мm]?\d+[\.\d]*$/.test(lowerSize.replace(/\s/g, ''))) {
+            return { 
+                isValid: false, 
+                message: 'Для фрез и сверл размер должен быть числовым (например: 8, 10.5, M6)' 
+            };
+        }
+    }
+    
+    return { isValid: true, value: size };
+}
+
 async function handleToolAddition() {
     const machine = document.getElementById('machine').value;
     const toolType = document.getElementById('toolType').value;
@@ -108,12 +159,33 @@ async function handleToolAddition() {
     const cellNumber = document.getElementById('cellNumber').value;
 
     if (!cellNumber || !machine || !toolType) {
-        showNotification('Пожалуйста, заполните все поля!', true);
+        showNotification('Пожалуйста, заполните все обязательные поля!', true);
         return;
     }
     
-    const tool = { machine, toolType, toolSize, cellNumber };
+    // Валидация размера инструмента
+    const validation = validateToolSize(toolType, toolSize);
+    if (!validation.isValid) {
+        showNotification(validation.message, true);
+        return;
+    }
+    
+    // Используем валидированное значение (может быть изменено, например, добавлена буква M)
+    const validatedToolSize = validation.value || toolSize;
+    
+    const tool = { 
+        machine, 
+        toolType, 
+        toolSize: validatedToolSize, 
+        cellNumber 
+    };
+    
     await addTool(tool);
+    
+    // Показываем сообщение о автоматической корректировке если было
+    if (validation.message) {
+        showNotification(validation.message);
+    }
     
     // Сохраняем текущие значения перед сбросом
     const currentMachine = selectStates.machine;
@@ -177,7 +249,7 @@ async function loadDataFromServer() {
 }
 
 function saveCurrentSelectValues() {
-    // Сохраняем текущие значения выпадающих списков
+    // Сохраняем текущие значения выпадающих списков и поля ввода
     selectStates.machine = document.getElementById('machine').value;
     selectStates.toolType = document.getElementById('toolType').value;
     selectStates.toolSize = document.getElementById('toolSize').value;
@@ -190,6 +262,7 @@ function restoreSelectValues() {
         const machineSelect = document.getElementById('machine');
         if (Array.from(machineSelect.options).some(opt => opt.value === selectStates.machine)) {
             machineSelect.value = selectStates.machine;
+            selectStates.machine = selectStates.machine;
         }
     }
     
@@ -197,21 +270,21 @@ function restoreSelectValues() {
         const toolTypeSelect = document.getElementById('toolType');
         if (Array.from(toolTypeSelect.options).some(opt => opt.value === selectStates.toolType)) {
             toolTypeSelect.value = selectStates.toolType;
+            selectStates.toolType = selectStates.toolType;
             updateToolSizeSelect();
         }
     }
     
     if (selectStates.toolSize) {
-        const toolSizeSelect = document.getElementById('toolSize');
-        if (Array.from(toolSizeSelect.options).some(opt => opt.value === selectStates.toolSize)) {
-            toolSizeSelect.value = selectStates.toolSize;
-        }
+        const toolSizeInput = document.getElementById('toolSize');
+        toolSizeInput.value = selectStates.toolSize;
     }
     
     if (selectStates.cellNumber) {
         const cellNumberSelect = document.getElementById('cellNumber');
         if (Array.from(cellNumberSelect.options).some(opt => opt.value === selectStates.cellNumber)) {
             cellNumberSelect.value = selectStates.cellNumber;
+            selectStates.cellNumber = selectStates.cellNumber;
         }
     }
 }
@@ -298,39 +371,35 @@ function updateToolTypeSelect() {
         toolTypeSelect.value = currentValue;
         selectStates.toolType = currentValue;
     }
+    
+    // Обновляем поле размера инструмента
+    updateToolSizeSelect();
 }
 
 function updateToolSizeSelect() {
     const toolTypeSelect = document.getElementById('toolType');
-    const toolSizeSelect = document.getElementById('toolSize');
-    const currentValue = selectStates.toolSize || toolSizeSelect.value;
+    const toolSizeInput = document.getElementById('toolSize');
     const selectedType = toolTypeSelect.value;
-    const toolTypes = window.toolDatabase.getToolTypes();
     
-    toolSizeSelect.innerHTML = '<option value="" disabled selected>Выберите размер</option>';
-    
-    const typeSizes = toolTypes[selectedType] || [];
-    if (typeSizes.length > 0) {
-        toolSizeSelect.disabled = false;
-        typeSizes.forEach(size => {
-            const option = document.createElement('option');
-            option.value = size;
-            option.textContent = size;
-            toolSizeSelect.appendChild(option);
-        });
-    } else {
-        toolSizeSelect.disabled = true;
-        const option = document.createElement('option');
-        option.value = '';
-        option.textContent = 'Не требуется';
-        option.selected = true;
-        toolSizeSelect.appendChild(option);
+    // Очищаем поле ввода при смене типа инструмента
+    if (selectedType !== toolSizeInput.dataset.lastType) {
+        toolSizeInput.value = '';
+        toolSizeInput.dataset.lastType = selectedType;
     }
     
-    // Восстанавливаем выбранное значение
-    if (currentValue && Array.from(toolSizeSelect.options).some(opt => opt.value === currentValue)) {
-        toolSizeSelect.value = currentValue;
-        selectStates.toolSize = currentValue;
+    // Устанавливаем placeholder в зависимости от типа инструмента
+    if (selectedType) {
+        const lowerType = selectedType.toLowerCase();
+        if (lowerType.includes('резьб') || lowerType.includes('thread')) {
+            toolSizeInput.placeholder = 'Например: M8, M10';
+        } else if (lowerType.includes('фрез') || lowerType.includes('mill') || 
+                   lowerType.includes('сверл') || lowerType.includes('drill')) {
+            toolSizeInput.placeholder = 'Например: 8, 10.5, 12';
+        } else {
+            toolSizeInput.placeholder = 'Размер инструмента';
+        }
+    } else {
+        toolSizeInput.placeholder = 'Размер инструмента';
     }
 }
 
@@ -647,8 +716,6 @@ function showNotification(message, isError = false) {
     }, 2000);
 }
 
-// Добавьте в конец файла script.js
-
 // Функция для получения количества звезд GitHub
 async function updateGitHubStars() {
     try {
@@ -664,21 +731,4 @@ async function updateGitHubStars() {
     } catch (error) {
         console.log('Не удалось получить данные GitHub');
     }
-}
-
-// Обновите функцию initializeApp():
-async function initializeApp() {
-    await loadDataFromServer();
-    setupEventListeners();
-    
-    // Для мобильных устройств используем только ручное обновление
-    if (!isMobileDevice) {
-        startRealTimeSync();
-    }
-    
-    restoreFormState();
-    updateConnectionInfo();
-    
-    // Обновляем звезды GitHub
-    updateGitHubStars();
 }

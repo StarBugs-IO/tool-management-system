@@ -12,30 +12,30 @@
         <div id="notification" class="notification"></div>
 
         <!-- Форма добавления инструмента -->
-        <form id="toolForm">
-            <div class="form-row">
-                <select id="machine" required>
-                    <option value="" disabled selected>Выберите станок</option>
-                    <option value="Все">Все</option>
-                    <!-- Станки будут загружены из админки -->
-                </select>
+        <!-- ЗАМЕНИТЬ существующую форму в index.html -->
+<form id="toolForm">
+    <div class="form-row">
+        <select id="machine" required>
+            <option value="" disabled selected>Выберите станок</option>
+            <option value="Все">Все</option>
+            <!-- Станки будут загружены из админки -->
+        </select>
 
-                <select id="toolType" required>
-                    <option value="" disabled selected>Выберите тип</option>
-                    <!-- Типы инструментов будут загружены из админки -->
-                </select>
+        <select id="toolType" required>
+            <option value="" disabled selected>Выберите тип</option>
+            <!-- Типы инструментов будут загружены из админки -->
+        </select>
 
-                <select id="toolSize" disabled>
-                    <option value="" disabled selected>Выберите размер</option>
-                </select>
+        <!-- ЗАМЕНИТЬ select на input -->
+        <input type="text" id="toolSize" placeholder="Размер инструмента" maxlength="20">
+        
+        <select id="cellNumber" required>
+            <option value="" disabled selected>Выберите ячейку</option>
+        </select>
 
-                <select id="cellNumber" required>
-                    <option value="" disabled selected>Выберите ячейку</option>
-                </select>
-
-                <button type="submit">Добавить</button>
-            </div>
-        </form>
+        <button type="submit">Добавить</button>
+    </div>
+</form>
 
         <!-- Список инструментов -->
         <h2>Список инструментов</h2>
