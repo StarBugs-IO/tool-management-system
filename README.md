@@ -71,7 +71,7 @@ cd tool-management-system
 start-server.bat
 
 # Для Linux/macOS
-python dist/server.py
+python server.py
 ```
 
 ### Откройте в браузере:
