@@ -563,6 +563,43 @@ textarea {
     background: #f0f0f0;
 }
 
+/* Стили для стандартных и пользовательских типов в админке */
+.standard-tool-card {
+    border-left: 4px solid #000000;
+}
+
+.custom-tool-card {
+    border-left: 4px solid #666666;
+}
+
+.standard-badge {
+    background: #000000;
+    color: #ffffff;
+    padding: 2px 8px;
+    font-size: 0.7em;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+.custom-badge {
+    background: #666666;
+    color: #ffffff;
+    padding: 2px 8px;
+    font-size: 0.7em;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+/* Стили для подсказки в модальном окне */
+.modal-content small {
+    color: #666666;
+    font-size: 0.8em;
+    font-style: italic;
+    display: block;
+    margin-top: 5px;
+    font-family: 'Courier New', monospace;
+}
+
 /* Футер в стиле главной страницы */
 .admin-footer {
     margin-top: 40px;

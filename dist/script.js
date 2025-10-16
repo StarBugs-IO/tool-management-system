@@ -296,7 +296,7 @@ function loadLocalData() {
 
 function updateInterface() {
     updateMachineSelect();
-    updateToolTypeSelect();
+    updateToolTypeSelect(); // Теперь использует фиксированный список
     updateCellNumberSelect();
     updateTable();
     updateConnectionInfo();
@@ -355,25 +355,108 @@ function updateMachineSelect() {
 function updateToolTypeSelect() {
     const toolTypeSelect = document.getElementById('toolType');
     const currentValue = selectStates.toolType || toolTypeSelect.value;
-    const toolTypes = window.toolDatabase.getToolTypes();
     
-    toolTypeSelect.innerHTML = '<option value="" disabled selected>Выберите тип</option>';
+    // Фиксированный список топ-10 инструментов для фрезерного станка с ЧПУ
+    const top10Tools = [
+        "Торцевая фреза",
+        "Концевая фреза", 
+        "Фасонная фреза",
+        "Сверло спиральное",
+        "Зенковка",
+        "Развертка",
+        "Резьбофреза",
+        "Расточной резец",
+        "Фреза червячная",
+        "Дисковая фреза"
+    ];
     
-    Object.keys(toolTypes).forEach(type => {
+    // Получаем пользовательские типы из базы данных
+    const customToolTypes = window.toolDatabase.getToolTypes();
+    const customToolTypesList = Object.keys(customToolTypes);
+    
+    toolTypeSelect.innerHTML = '<option value="" disabled selected>Выберите тип</option><option value="Все">Все типы</option>';
+    
+    // Добавляем стандартные топ-10 инструментов
+    top10Tools.forEach(toolType => {
         const option = document.createElement('option');
-        option.value = type;
-        option.textContent = type;
+        option.value = toolType;
+        option.textContent = toolType;
+        option.className = 'standard-tool-type';
         toolTypeSelect.appendChild(option);
     });
     
+    // Добавляем пользовательские типы инструментов, если они есть
+    if (customToolTypesList.length > 0) {
+        // Добавляем разделитель
+        const separator = document.createElement('option');
+        separator.disabled = true;
+        separator.textContent = '──────────';
+        toolTypeSelect.appendChild(separator);
+        
+        customToolTypesList.forEach(toolType => {
+            // Не добавляем дубликаты стандартных типов
+            if (!top10Tools.includes(toolType)) {
+                const option = document.createElement('option');
+                option.value = toolType;
+                option.textContent = toolType;
+                option.className = 'custom-tool-type';
+                toolTypeSelect.appendChild(option);
+            }
+        });
+    }
+    
     // Восстанавливаем выбранное значение
-    if (currentValue && Array.from(toolTypeSelect.options).some(opt => opt.value === currentValue)) {
+    if (currentValue && (top10Tools.includes(currentValue) || customToolTypesList.includes(currentValue))) {
         toolTypeSelect.value = currentValue;
         selectStates.toolType = currentValue;
     }
     
     // Обновляем поле размера инструмента
     updateToolSizeSelect();
+}
+
+// ОБНОВИТЬ обработчик изменения типа инструмента в setupEventListeners
+function setupEventListeners() {
+    const toolForm = document.getElementById('toolForm');
+    const toolTypeSelect = document.getElementById('toolType');
+    const machineSelect = document.getElementById('machine');
+    const toolSizeInput = document.getElementById('toolSize');
+    const cellNumberSelect = document.getElementById('cellNumber');
+    
+    // Сохраняем состояние при изменении
+    machineSelect.addEventListener('change', function() {
+        formState.machine = this.value;
+        selectStates.machine = this.value;
+        updateCellNumberSelect();
+        updateTable(); // Обновляем таблицу при изменении станка
+    });
+
+    toolTypeSelect.addEventListener('change', function() {
+        formState.toolType = this.value;
+        selectStates.toolType = this.value;
+        updateToolSizeSelect();
+        updateTable(); // ОБНОВЛЕНИЕ: Обновляем таблицу при изменении типа инструмента
+    });
+
+    toolSizeInput.addEventListener('input', function() {
+        formState.toolSize = this.value;
+        selectStates.toolSize = this.value;
+    });
+
+    cellNumberSelect.addEventListener('change', function() {
+        formState.cellNumber = this.value;
+        selectStates.cellNumber = this.value;
+    });
+
+    toolForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        await handleToolAddition();
+    });
+
+    // Обработчик кнопки обновления
+    document.getElementById('refreshBtn')?.addEventListener('click', function() {
+        manualRefresh();
+    });
 }
 
 function updateToolSizeSelect() {
@@ -550,6 +633,23 @@ async function checkForChanges() {
     }
 }
 
+// ДОБАВИM функцию фильтрации инструментов по типу
+function filterToolsByType(toolType, machine = null) {
+    let filteredTools = tools;
+    
+    // Фильтрация по типу инструмента
+    if (toolType && toolType !== 'Все') {
+        filteredTools = filteredTools.filter(tool => tool.toolType === toolType);
+    }
+    
+    // Дополнительная фильтрация по станку
+    if (machine && machine !== 'Все') {
+        filteredTools = filteredTools.filter(tool => tool.machine === machine);
+    }
+    
+    return filteredTools;
+}
+
 // Реальная синхронизация в реальном времени (только для ПК)
 function startRealTimeSync() {
     if (isMobileDevice) return;
@@ -589,13 +689,14 @@ function formatDate(date) {
 function updateTable() {
     const toolTable = document.getElementById('toolTable');
     const machineSelect = document.getElementById('machine');
+    const toolTypeSelect = document.getElementById('toolType');
     const selectedMachine = machineSelect.value;
+    const selectedToolType = toolTypeSelect.value;
     
     if (!toolTable) return;
     
-    const filteredTools = selectedMachine && selectedMachine !== "Все" 
-        ? tools.filter(tool => tool.machine === selectedMachine)
-        : tools;
+    // Используем фильтрацию по типу инструмента и станку
+    const filteredTools = filterToolsByType(selectedToolType, selectedMachine);
 
     toolTable.innerHTML = '';
 
@@ -609,6 +710,7 @@ function updateTable() {
         <div class="header-center">
             <span class="update-time">📅 Обновлено: ${new Date().toLocaleString('ru-RU')}</span>
             ${isMobileDevice ? '<div class="mobile-hint">Используйте кнопку "Обновить" для синхронизации</div>' : ''}
+            ${selectedToolType && selectedToolType !== 'Все' ? `<div class="filter-info">🔍 Фильтр: ${selectedToolType}</div>` : ''}
         </div>
         <div class="header-right">
             <button id="refreshBtn" class="refresh-btn" title="Обновить данные">🔄 Обновить</button>
@@ -622,9 +724,17 @@ function updateTable() {
     if (filteredTools.length === 0) {
         const noToolsDiv = document.createElement('div');
         noToolsDiv.className = 'no-tools';
+        
+        let message = '';
+        if (selectedToolType && selectedToolType !== 'Все') {
+            message = `Инструменты типа "${selectedToolType}" отсутствуют${selectedMachine && selectedMachine !== 'Все' ? ` на станке ${selectedMachine}` : ''}`;
+        } else {
+            message = 'Инструменты отсутствуют';
+        }
+        
         noToolsDiv.innerHTML = `
             <div style="font-size: 3em; margin-bottom: 10px;">📭</div>
-            <h3>Инструменты отсутствуют</h3>
+            <h3>${message}</h3>
             <p>Добавьте первый инструмент используя форму выше</p>
         `;
         toolTable.appendChild(noToolsDiv);

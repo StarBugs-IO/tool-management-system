@@ -5,7 +5,6 @@ class AdminPanel {
         this.editingMachine = null;
         this.editingToolType = null;
         
-        // Инициализация после загрузки DOM
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
         } else {
@@ -14,24 +13,8 @@ class AdminPanel {
         }
     }
 
-// Добавьте метод:
-async updateGitHubStars() {
-    try {
-        const response = await fetch('https://api.github.com/repos/StarBugs-IO/tool-management-system');
-        if (response.ok) {
-            const repoData = await response.json();
-            const stars = repoData.stargazers_count;
-            const starsElement = document.getElementById('githubStars');
-            if (starsElement) {
-                starsElement.textContent = stars;
-            }
-        }
-    } catch (error) {
-        console.log('Не удалось получить данные GitHub');
-    }
-}
-
-    getDatabase() {
+    // Используем стрелочные функции для автоматической привязки this
+    getDatabase = () => {
         if (typeof window.toolDatabase !== 'undefined') {
             return window.toolDatabase;
         } else {
@@ -40,7 +23,7 @@ async updateGitHubStars() {
         }
     }
 
-    createTempDatabase() {
+    createTempDatabase = () => {
         return {
             getMachines: () => JSON.parse(localStorage.getItem('admin_machines')) || [],
             saveMachines: (machines) => localStorage.setItem('admin_machines', JSON.stringify(machines)),
@@ -61,26 +44,45 @@ async updateGitHubStars() {
         };
     }
 
-    async init() {
-        console.log('Инициализация админ-панели...');
-        
-        // Загружаем данные с сервера
-        await this.loadDataFromServer();
-        
-        // Настройка базовых обработчиков
-        this.setupBasicEventListeners();
-        
-        // Загрузка данных
-        this.loadDashboard();
-        this.loadMachines();
-        this.loadToolTypes();
-        
-        this.logActivity('Админ-панель запущена');
-        console.log('Админ-панель успешно инициализирована');
+    updateGitHubStars = async () => {
+        try {
+            const response = await fetch('https://api.github.com/repos/StarBugs-IO/tool-management-system');
+            if (response.ok) {
+                const repoData = await response.json();
+                const stars = repoData.stargazers_count;
+                const starsElement = document.getElementById('githubStars');
+                if (starsElement) {
+                    starsElement.textContent = stars;
+                }
+            }
+        } catch (error) {
+            console.log('Не удалось получить данные GitHub');
+        }
     }
 
-    // НОВАЯ ФУНКЦИЯ: Загрузка данных с сервера
-    async loadDataFromServer() {
+    init = async () => {
+        console.log('Инициализация админ-панели...');
+        
+        try {
+            // Загружаем данные с сервера
+            await this.loadDataFromServer();
+            
+            // Настройка базовых обработчиков
+            this.setupBasicEventListeners();
+            
+            // Загрузка данных
+            this.loadDashboard();
+            this.loadMachines();
+            this.loadToolTypes();
+            
+            this.logActivity('Админ-панель запущена');
+            console.log('Админ-панель успешно инициализирована');
+        } catch (error) {
+            console.error('Ошибка инициализации админ-панели:', error);
+        }
+    }
+
+    loadDataFromServer = async () => {
         try {
             const response = await fetch(`${window.location.origin}/api/full-data`);
             if (response.ok) {
@@ -102,8 +104,7 @@ async updateGitHubStars() {
         }
     }
 
-    // НОВАЯ ФУНКЦИЯ: Синхронизация с сервером
-    async syncWithServer() {
+    syncWithServer = async () => {
         try {
             const allData = {
                 machines: this.db.getMachines(),
@@ -127,7 +128,7 @@ async updateGitHubStars() {
         }
     }
 
-    setupBasicEventListeners() {
+    setupBasicEventListeners = () => {
         console.log('Настройка базовых обработчиков...');
         
         // Навигация
@@ -161,7 +162,7 @@ async updateGitHubStars() {
         }
     }
 
-    showSection(sectionId) {
+    showSection = (sectionId) => {
         // Скрываем все разделы
         const sections = document.querySelectorAll('.admin-section');
         sections.forEach(section => {
@@ -197,7 +198,7 @@ async updateGitHubStars() {
         this.logActivity(`Переход в раздел: ${sectionId}`);
     }
 
-    loadDashboard() {
+    loadDashboard = () => {
         const tools = this.db.getTools();
         const machines = this.db.getMachines();
         
@@ -219,14 +220,14 @@ async updateGitHubStars() {
         this.loadRecentActivity();
     }
 
-    safeUpdateElement(elementId, value) {
+    safeUpdateElement = (elementId, value) => {
         const element = document.getElementById(elementId);
         if (element) {
             element.textContent = value;
         }
     }
 
-    loadRecentActivity() {
+    loadRecentActivity = () => {
         const activityList = document.getElementById('recentActivity');
         if (!activityList) return;
         
@@ -252,7 +253,7 @@ async updateGitHubStars() {
         });
     }
 
-    loadMachines() {
+    loadMachines = () => {
         const machinesList = document.getElementById('machinesList');
         if (!machinesList) {
             console.log('Элемент machinesList не найден, создаем...');
@@ -285,7 +286,7 @@ async updateGitHubStars() {
         });
     }
 
-    createMachinesSection() {
+    createMachinesSection = () => {
         // Создаем раздел станков если его нет
         const machinesSection = document.getElementById('machines');
         if (!machinesSection) return;
@@ -298,7 +299,7 @@ async updateGitHubStars() {
         this.loadMachines();
     }
 
-    loadToolTypes() {
+    loadToolTypes = () => {
         const toolTypesList = document.getElementById('toolTypesList');
         if (!toolTypesList) {
             console.log('Элемент toolTypesList не найден, создаем...');
@@ -310,30 +311,57 @@ async updateGitHubStars() {
         toolTypesList.innerHTML = '';
 
         const toolTypeKeys = Object.keys(toolTypes);
+        
+        // Фиксированный список стандартных инструментов
+        const standardTools = [
+            "Торцевая фреза", "Концевая фреза", "Фасонная фреза", "Сверло спиральное", 
+            "Зенковка", "Развертка", "Резьбофреза", "Расточной резец", 
+            "Фреза червячная", "Дисковая фреза"
+        ];
+
         if (toolTypeKeys.length === 0) {
             toolTypesList.innerHTML = '<div class="no-data">Нет добавленных типов инструментов</div>';
             return;
         }
 
-        toolTypeKeys.forEach(toolType => {
-            const sizes = toolTypes[toolType];
+        // Сначала отображаем стандартные типы
+        standardTools.forEach(toolType => {
             const toolTypeCard = document.createElement('div');
-            toolTypeCard.className = 'item-card';
+            toolTypeCard.className = 'item-card standard-tool-card';
             toolTypeCard.innerHTML = `
                 <div class="item-info">
                     <h3>${toolType}</h3>
-                    <p>Размеры: ${sizes.length > 0 ? sizes.join(', ') : 'Не требуются'}</p>
+                    <span class="standard-badge">Стандартный тип</span>
                 </div>
                 <div class="item-actions">
-                    <button class="btn-secondary" onclick="adminPanel.editToolType('${toolType}')">✏️ Редактировать</button>
+                    <button class="btn-secondary" onclick="adminPanel.renameToolType('${toolType}')">✏️ Переименовать</button>
                     <button class="btn-danger" onclick="adminPanel.deleteToolType('${toolType}')">🗑️ Удалить</button>
                 </div>
             `;
             toolTypesList.appendChild(toolTypeCard);
         });
+
+        // Затем пользовательские типы
+        toolTypeKeys.forEach(toolType => {
+            if (!standardTools.includes(toolType)) {
+                const toolTypeCard = document.createElement('div');
+                toolTypeCard.className = 'item-card custom-tool-card';
+                toolTypeCard.innerHTML = `
+                    <div class="item-info">
+                        <h3>${toolType}</h3>
+                        <span class="custom-badge">Пользовательский тип</span>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-secondary" onclick="adminPanel.renameToolType('${toolType}')">✏️ Переименовать</button>
+                        <button class="btn-danger" onclick="adminPanel.deleteToolType('${toolType}')">🗑️ Удалить</button>
+                    </div>
+                `;
+                toolTypesList.appendChild(toolTypeCard);
+            }
+        });
     }
 
-    createToolTypesSection() {
+    createToolTypesSection = () => {
         // Создаем раздел типов инструментов если его нет
         const toolsSection = document.getElementById('tools');
         if (!toolsSection) return;
@@ -346,7 +374,7 @@ async updateGitHubStars() {
         this.loadToolTypes();
     }
 
-    getStatusBadge(status) {
+    getStatusBadge = (status) => {
         const badges = {
             'active': '🟢 Активный',
             'maintenance': '🟡 На обслуживании',
@@ -355,7 +383,7 @@ async updateGitHubStars() {
         return badges[status] || status;
     }
 
-    async addMachine() {
+    addMachine = async () => {
         const name = document.getElementById('machineName')?.value;
         const cells = parseInt(document.getElementById('machineCells')?.value);
         const status = document.getElementById('machineStatus')?.value;
@@ -387,22 +415,24 @@ async updateGitHubStars() {
         this.loadMachines();
     }
 
-    async addToolType() {
+    addToolType = async () => {
         const name = document.getElementById('toolTypeName')?.value;
-        const sizesInput = document.getElementById('toolTypeSizes')?.value;
 
         if (!name) {
             this.showNotification('Пожалуйста, укажите название типа инструмента', true);
             return;
         }
 
-        let sizes = [];
-        if (sizesInput && sizesInput.trim()) {
-            sizes = sizesInput.split(',').map(size => size.trim()).filter(size => size);
-        }
-
         const toolTypes = this.db.getToolTypes();
-        toolTypes[name] = sizes;
+        
+        // Проверяем, что тип с таким именем не существует
+        if (toolTypes[name] !== undefined) {
+            this.showNotification(`Тип инструмента "${name}" уже существует!`, true);
+            return;
+        }
+        
+        // Создаем новый тип с пустым массивом размеров
+        toolTypes[name] = [];
         this.db.saveToolTypes(toolTypes);
         
         // Синхронизируем с сервером
@@ -416,7 +446,85 @@ async updateGitHubStars() {
         this.loadToolTypes();
     }
 
-    editMachine(machineId) {
+    renameToolType = (oldName) => {
+        const newName = prompt(`Введите новое название для типа "${oldName}":`, oldName);
+        
+        if (!newName || newName.trim() === '' || newName === oldName) {
+            return;
+        }
+        
+        const toolTypes = this.db.getToolTypes();
+        
+        // Проверяем, что новое имя не занято
+        if (toolTypes[newName] !== undefined) {
+            this.showNotification(`Тип инструмента "${newName}" уже существует!`, true);
+            return;
+        }
+        
+        // Сохраняем размеры под новым именем и удаляем старое
+        toolTypes[newName] = toolTypes[oldName] || [];
+        delete toolTypes[oldName];
+        
+        this.db.saveToolTypes(toolTypes);
+        
+        // Обновляем все инструменты, которые используют старый тип
+        this.updateToolsWithNewTypeName(oldName, newName);
+        
+        // Синхронизируем с сервером
+        this.syncWithServer();
+        
+        this.logActivity(`Переименован тип инструмента: "${oldName}" → "${newName}"`);
+        this.showNotification('Тип инструмента успешно переименован!');
+        this.loadToolTypes();
+    }
+
+    updateToolsWithNewTypeName = (oldName, newName) => {
+        const tools = this.db.getTools();
+        let updatedCount = 0;
+        
+        const updatedTools = tools.map(tool => {
+            if (tool.toolType === oldName) {
+                updatedCount++;
+                return {
+                    ...tool,
+                    toolType: newName
+                };
+            }
+            return tool;
+        });
+        
+        if (updatedCount > 0) {
+            this.db.saveTools(updatedTools);
+            this.logActivity(`Обновлено ${updatedCount} инструментов с новым типом`);
+        }
+    }
+
+    deleteToolType = async (toolType) => {
+        // Проверяем, используется ли этот тип в инструментах
+        const tools = this.db.getTools();
+        const toolsUsingThisType = tools.filter(tool => tool.toolType === toolType);
+        
+        if (toolsUsingThisType.length > 0) {
+            this.showNotification(`Нельзя удалить тип "${toolType}"! Он используется в ${toolsUsingThisType.length} инструментах.`, true);
+            return;
+        }
+        
+        if (confirm(`Вы уверены, что хотите удалить тип "${toolType}"?`)) {
+            const toolTypes = this.db.getToolTypes();
+            delete toolTypes[toolType];
+            
+            this.db.saveToolTypes(toolTypes);
+            
+            // Синхронизируем с сервером
+            await this.syncWithServer();
+            
+            this.logActivity(`Удален тип инструмента: ${toolType}`);
+            this.showNotification('Тип инструмента успешно удален!');
+            this.loadToolTypes();
+        }
+    }
+
+    editMachine = (machineId) => {
         const machines = this.db.getMachines();
         const machine = machines.find(m => m.id === machineId);
         
@@ -425,7 +533,7 @@ async updateGitHubStars() {
         }
     }
 
-    async deleteMachine(machineId) {
+    deleteMachine = async (machineId) => {
         if (confirm('Вы уверены, что хотите удалить этот станок?')) {
             const machines = this.db.getMachines();
             const machine = machines.find(m => m.id === machineId);
@@ -444,38 +552,18 @@ async updateGitHubStars() {
         }
     }
 
-    editToolType(toolType) {
-        this.showNotification('Редактирование типов инструментов временно недоступно');
-    }
-
-    async deleteToolType(toolType) {
-        if (confirm(`Вы уверены, что хотите удалить тип "${toolType}"?`)) {
-            const toolTypes = this.db.getToolTypes();
-            delete toolTypes[toolType];
-            
-            this.db.saveToolTypes(toolTypes);
-            
-            // Синхронизируем с сервером
-            await this.syncWithServer();
-            
-            this.logActivity(`Удален тип инструмента: ${toolType}`);
-            this.showNotification('Тип инструмента успешно удален!');
-            this.loadToolTypes();
-        }
-    }
-
-    logActivity(action) {
+    logActivity = (action) => {
         this.db.addActivity(action);
     }
 
-    showModal(modalId) {
+    showModal = (modalId) => {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'block';
         }
     }
 
-    closeModal(modalId) {
+    closeModal = (modalId) => {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'none';
@@ -490,7 +578,7 @@ async updateGitHubStars() {
         }
     }
 
-    showNotification(message, isError = false) {
+    showNotification = (message, isError = false) => {
         // Создаем или находим уведомление
         let notification = document.getElementById('adminNotification');
         if (!notification) {
@@ -548,4 +636,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log('Admin Panel script loaded');
-

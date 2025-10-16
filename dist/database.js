@@ -5,23 +5,34 @@ class ToolDatabase {
         this.init();
     }
 
-    init() {
-        // Инициализация пустой базы данных
-        if (!localStorage.getItem(this.dbName)) {
-            const initialData = {
-                version: '1.0.0',
-                machines: [], // Пустой массив станков
-                toolTypes: {}, // Пустой объект типов инструментов
-                tools: [],
-                activityLog: [],
-                settings: {
-                    autoBackup: true,
-                    syncInterval: 3000
-                }
-            };
-            this.save(initialData);
-        }
+init() {
+    // Инициализация пустой базы данных
+    if (!localStorage.getItem(this.dbName)) {
+        const initialData = {
+            version: '1.0.0',
+            machines: [],
+            toolTypes: {
+                "Торцевая фреза": [],
+                "Концевая фреза": [],
+                "Фасонная фреза": [],
+                "Сверло спиральное": [],
+                "Зенковка": [],
+                "Развертка": [],
+                "Резьбофреза": [],
+                "Расточной резец": [],
+                "Фреза червячная": [],
+                "Дисковая фреза": []
+            },
+            tools: [],
+            activityLog: [],
+            settings: {
+                autoBackup: true,
+                syncInterval: 3000
+            }
+        };
+        this.save(initialData);
     }
+}
 
     // Получить все данные
     getAll() {

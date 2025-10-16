@@ -114,22 +114,21 @@
         </div>
     </div>
 
-    <!-- Модальное окно добавления типа инструмента -->
-    <div id="addToolTypeModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('addToolTypeModal')">&times;</span>
-            <h2>Добавить тип инструмента</h2>
-            <form id="toolTypeForm">
-                <input type="text" id="toolTypeName" placeholder="Название типа" required>
-                <textarea id="toolTypeSizes" placeholder="Размеры (через запятую)"></textarea>
-                <small>Оставьте пустым, если размеры не требуются</small>
-                <div class="form-buttons">
-                    <button type="submit" class="btn-primary">Сохранить</button>
-                    <button type="button" class="btn-secondary" onclick="closeModal('addToolTypeModal')">Отмена</button>
-                </div>
-            </form>
-        </div>
+<!-- Модальное окно добавления типа инструмента -->
+<div id="addToolTypeModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('addToolTypeModal')">&times;</span>
+        <h2>Добавить тип инструмента</h2>
+        <form id="toolTypeForm">
+            <input type="text" id="toolTypeName" placeholder="Название типа инструмента" required>
+            <small>Размеры инструментов вводятся пользователями при добавлении</small>
+            <div class="form-buttons">
+                <button type="submit" class="btn-primary">Сохранить</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('addToolTypeModal')">Отмена</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <!-- Подключаем database.js ПЕРВЫМ -->
     <script src="../database.js"></script>

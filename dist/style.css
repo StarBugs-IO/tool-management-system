@@ -110,6 +110,42 @@ h3 {
     align-items: end;
 }
 
+/* В файле style.css ДОБАВИТЬ стили для нового выпадающего списка: */
+
+/* Стили для выпадающего списка типов инструментов */
+#toolType {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #333333;
+    padding: 8px 30px 8px 12px;
+    outline: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 38px;
+    box-sizing: border-box;
+    line-height: 1.4;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+}
+
+#toolType:focus {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-color: #000000;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    #toolType {
+        font-size: 16px;
+        padding: 10px 35px 10px 15px;
+        height: 44px;
+    }
+}
 
 /* Стили для поля ввода размера инструмента */
 #toolSize {
@@ -177,6 +213,55 @@ h3 {
     .form-row select {
         padding: 10px 35px 10px 15px; /* Увеличиваем padding для мобильных */
         line-height: 1.5;
+    }
+}
+
+/* Стили для информации о фильтре */
+.filter-info {
+    background: #e8e8e8;
+    border: 1px solid #333333;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    margin-top: 5px;
+    font-family: 'Courier New', monospace;
+    color: #000000;
+}
+
+/* Стили для системных типов инструментов */
+.read-only-badge {
+    background: #e8e8e8;
+    color: #666666;
+    padding: 5px 10px;
+    border: 1px solid #cccccc;
+    font-size: 0.8em;
+    font-family: 'Courier New', monospace;
+}
+
+/* Стили для стандартных типов инструментов */
+.standard-tool-type {
+    font-weight: bold;
+    color: #000000;
+}
+
+/* Стили для пользовательских типов инструментов */
+.custom-tool-type {
+    color: #666666;
+    font-style: italic;
+}
+
+/* Стили для разделителя в выпадающем списке */
+select option:disabled {
+    color: #cccccc;
+    background: #f8f8f8;
+    text-align: center;
+    font-size: 0.8em;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .filter-info {
+        font-size: 0.8em;
+        padding: 4px 8px;
     }
 }
 
