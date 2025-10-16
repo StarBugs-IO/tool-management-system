@@ -9,13 +9,13 @@ class AdminPanel {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
         } else {
-            this.init();
-            this.updateGitHubStars();
+            // Небольшая задержка для гарантии инициализации базы данных
+            setTimeout(() => this.init(), 100);
         }
     }
 
     getDatabase = () => {
-        if (typeof window.toolDatabase !== 'undefined') {
+        if (typeof window.toolDatabase !== 'undefined' && window.toolDatabase.getTools) {
             return window.toolDatabase;
         } else {
             console.warn('Глобальная база данных не найдена, создаем временную');
@@ -24,10 +24,27 @@ class AdminPanel {
     }
 
     createTempDatabase = () => {
-        return {
+        // Создаем временную базу с стандартными типами
+        const tempDB = {
             getMachines: () => JSON.parse(localStorage.getItem('admin_machines')) || [],
             saveMachines: (machines) => localStorage.setItem('admin_machines', JSON.stringify(machines)),
-            getToolTypes: () => JSON.parse(localStorage.getItem('admin_toolTypes')) || {},
+            getToolTypes: () => {
+                const saved = JSON.parse(localStorage.getItem('admin_toolTypes')) || {};
+                // Добавляем стандартные типы если их нет
+                const standardTypes = {
+                    "Торцевая фреза": [],
+                    "Концевая фреза": [],
+                    "Фасонная фреза": [],
+                    "Сверло спиральное": [],
+                    "Зенковка": [],
+                    "Развертка": [],
+                    "Резьбофреза": [],
+                    "Расточной резец": [],
+                    "Фреза червячная": [],
+                    "Дисковая фреза": []
+                };
+                return { ...standardTypes, ...saved };
+            },
             saveToolTypes: (toolTypes) => localStorage.setItem('admin_toolTypes', JSON.stringify(toolTypes)),
             getTools: () => JSON.parse(localStorage.getItem('tools_backup')) || [],
             saveTools: (tools) => localStorage.setItem('tools_backup', JSON.stringify(tools)),
@@ -40,8 +57,29 @@ class AdminPanel {
                 });
                 if (activityLog.length > 100) activityLog.splice(0, activityLog.length - 100);
                 localStorage.setItem('admin_activity', JSON.stringify(activityLog));
-            }
+            },
+            getAll: () => ({
+                machines: JSON.parse(localStorage.getItem('admin_machines')) || [],
+                toolTypes: (() => {
+                    const saved = JSON.parse(localStorage.getItem('admin_toolTypes')) || {};
+                    const standardTypes = {
+                        "Торцевая фреза": [],
+                        "Концевая фреза": [],
+                        "Фасонная фреза": [],
+                        "Сверло спиральное": [],
+                        "Зенковка": [],
+                        "Развертка": [],
+                        "Резьбофреза": [],
+                        "Расточной резец": [],
+                        "Фреза червячная": [],
+                        "Дисковая фреза": []
+                    };
+                    return { ...standardTypes, ...saved };
+                })(),
+                tools: JSON.parse(localStorage.getItem('tools_backup')) || []
+            })
         };
+        return tempDB;
     }
 
     getActivityLogger = () => {
@@ -78,6 +116,9 @@ class AdminPanel {
         console.log('🔄 Инициализация админ-панели...');
         
         try {
+            // Сначала убедимся, что стандартные типы инициализированы
+            this.ensureStandardToolTypes();
+            
             // Загружаем данные с сервера
             await this.loadDataFromServer();
             
@@ -96,6 +137,33 @@ class AdminPanel {
         }
     }
 
+    // НОВЫЙ МЕТОД: Гарантирует наличие стандартных типов
+    ensureStandardToolTypes = () => {
+        console.log('🔧 Проверка стандартных типов инструментов...');
+        const toolTypes = this.db.getToolTypes();
+        const standardTools = [
+            "Торцевая фреза", "Концевая фреза", "Фасонная фреза", "Сверло спиральное", 
+            "Зенковка", "Развертка", "Резьбофреза", "Расточной резец", 
+            "Фреза червячная", "Дисковая фреза"
+        ];
+
+        let needsUpdate = false;
+        standardTools.forEach(toolType => {
+            if (!toolTypes[toolType]) {
+                toolTypes[toolType] = [];
+                needsUpdate = true;
+                console.log(`✅ Добавлен стандартный тип: ${toolType}`);
+            }
+        });
+
+        if (needsUpdate) {
+            this.db.saveToolTypes(toolTypes);
+            console.log('✅ Стандартные типы инструментов обновлены');
+        } else {
+            console.log('✅ Стандартные типы инструментов уже существуют');
+        }
+    }
+
     loadDataFromServer = async () => {
         try {
             const response = await fetch(`${window.location.origin}/api/full-data`);
@@ -111,7 +179,21 @@ class AdminPanel {
                     this.db.saveMachines(serverData.machines);
                 }
                 if (serverData.toolTypes) {
-                    this.db.saveToolTypes(serverData.toolTypes);
+                    // Сохраняем типы с сервера, но гарантируем наличие стандартных
+                    const mergedToolTypes = { ...serverData.toolTypes };
+                    const standardTools = [
+                        "Торцевая фреза", "Концевая фреза", "Фасонная фреза", "Сверло спиральное", 
+                        "Зенковка", "Развертка", "Резьбофреза", "Расточной резец", 
+                        "Фреза червячная", "Дисковая фреза"
+                    ];
+                    
+                    standardTools.forEach(toolType => {
+                        if (!mergedToolTypes[toolType]) {
+                            mergedToolTypes[toolType] = [];
+                        }
+                    });
+                    
+                    this.db.saveToolTypes(mergedToolTypes);
                 }
                 
                 console.log('✅ Данные админки загружены с сервера');
@@ -331,19 +413,28 @@ class AdminPanel {
 
         // Сначала отображаем стандартные типы
         standardTools.forEach(toolType => {
-            const toolTypeCard = document.createElement('div');
-            toolTypeCard.className = 'item-card standard-tool-card';
-            toolTypeCard.innerHTML = `
-                <div class="item-info">
-                    <h3>${toolType}</h3>
-                    <span class="standard-badge">Стандартный тип</span>
-                </div>
-                <div class="item-actions">
-                    <button class="btn-secondary" onclick="adminPanel.renameToolType('${toolType}')">✏️ Переименовать</button>
-                    <button class="btn-danger" onclick="adminPanel.deleteToolType('${toolType}')">🗑️ Удалить</button>
-                </div>
-            `;
-            toolTypesList.appendChild(toolTypeCard);
+            if (toolTypes[toolType] !== undefined) {
+                const toolTypeCard = document.createElement('div');
+                toolTypeCard.className = 'item-card standard-tool-card';
+                
+                // Проверяем, используется ли тип в инструментах
+                const tools = this.db.getTools();
+                const toolsUsingThisType = tools.filter(tool => tool.toolType === toolType);
+                const isUsed = toolsUsingThisType.length > 0;
+                
+                toolTypeCard.innerHTML = `
+                    <div class="item-info">
+                        <h3>${toolType}</h3>
+                        <span class="standard-badge">Стандартный тип</span>
+                        ${isUsed ? `<br><small style="color: #666;">Используется в ${toolsUsingThisType.length} инструментах</small>` : ''}
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-secondary" onclick="adminPanel.renameToolType('${toolType}')">✏️ Переименовать</button>
+                        ${!isUsed ? `<button class="btn-danger" onclick="adminPanel.deleteToolType('${toolType}')">🗑️ Удалить</button>` : ''}
+                    </div>
+                `;
+                toolTypesList.appendChild(toolTypeCard);
+            }
         });
 
         // Затем пользовательские типы
@@ -351,10 +442,17 @@ class AdminPanel {
             if (!standardTools.includes(toolType)) {
                 const toolTypeCard = document.createElement('div');
                 toolTypeCard.className = 'item-card custom-tool-card';
+                
+                // Проверяем, используется ли тип в инструментах
+                const tools = this.db.getTools();
+                const toolsUsingThisType = tools.filter(tool => tool.toolType === toolType);
+                const isUsed = toolsUsingThisType.length > 0;
+                
                 toolTypeCard.innerHTML = `
                     <div class="item-info">
                         <h3>${toolType}</h3>
                         <span class="custom-badge">Пользовательский тип</span>
+                        ${isUsed ? `<br><small style="color: #666;">Используется в ${toolsUsingThisType.length} инструментах</small>` : ''}
                     </div>
                     <div class="item-actions">
                         <button class="btn-secondary" onclick="adminPanel.renameToolType('${toolType}')">✏️ Переименовать</button>
@@ -364,9 +462,13 @@ class AdminPanel {
                 toolTypesList.appendChild(toolTypeCard);
             }
         });
+
+        // Если нет ни стандартных, ни пользовательских типов
+        if (toolTypesList.children.length === 0) {
+            toolTypesList.innerHTML = '<div class="no-data">Нет добавленных типов инструментов</div>';
+        }
     }
 
-    // Остальные функции остаются без изменений...
     getStatusBadge = (status) => {
         const badges = {
             'active': '🟢 Активный',
@@ -397,6 +499,9 @@ class AdminPanel {
         machines.push(newMachine);
         this.db.saveMachines(machines);
         
+        // Синхронизируем с сервером
+        await this.syncWithServer();
+        
         this.logActivity(`Добавлен станок: ${name}`);
         this.showNotification('Станок успешно добавлен!');
         this.closeModal('addMachineModal');
@@ -425,6 +530,9 @@ class AdminPanel {
         toolTypes[name] = [];
         this.db.saveToolTypes(toolTypes);
         
+        // Синхронизируем с сервером
+        await this.syncWithServer();
+        
         this.logActivity(`Добавлен тип инструмента: ${name}`);
         this.showNotification('Тип инструмента успешно добавлен!');
         this.closeModal('addToolTypeModal');
@@ -433,7 +541,7 @@ class AdminPanel {
         this.loadToolTypes();
     }
 
-    renameToolType = (oldName) => {
+    renameToolType = async (oldName) => {
         const newName = prompt(`Введите новое название для типа "${oldName}":`, oldName);
         
         if (!newName || newName.trim() === '' || newName === oldName) {
@@ -456,6 +564,9 @@ class AdminPanel {
         
         // Обновляем все инструменты, которые используют старый тип
         this.updateToolsWithNewTypeName(oldName, newName);
+        
+        // Синхронизируем с сервером
+        await this.syncWithServer();
         
         this.logActivity(`Переименован тип инструмента: "${oldName}" → "${newName}"`);
         this.showNotification('Тип инструмента успешно переименован!');
@@ -493,11 +604,26 @@ class AdminPanel {
             return;
         }
         
-        if (confirm(`Вы уверены, что хотите удалить тип "${toolType}"?`)) {
+        // Для стандартных типов показываем предупреждение
+        const standardTools = [
+            "Торцевая фреза", "Концевая фреза", "Фасонная фреза", "Сверло спиральное", 
+            "Зенковка", "Развертка", "Резьбофреза", "Расточной резец", 
+            "Фреза червячная", "Дисковая фреза"
+        ];
+        
+        const isStandard = standardTools.includes(toolType);
+        const message = isStandard 
+            ? `Вы уверены, что хотите удалить стандартный тип "${toolType}"? Он может быть автоматически восстановлен при следующем запуске.`
+            : `Вы уверены, что хотите удалить тип "${toolType}"?`;
+        
+        if (confirm(message)) {
             const toolTypes = this.db.getToolTypes();
             delete toolTypes[toolType];
             
             this.db.saveToolTypes(toolTypes);
+            
+            // Синхронизируем с сервером
+            await this.syncWithServer();
             
             this.logActivity(`Удален тип инструмента: ${toolType}`);
             this.showNotification('Тип инструмента успешно удален!');
@@ -522,12 +648,35 @@ class AdminPanel {
             
             this.db.saveMachines(updatedMachines);
             
+            // Синхронизируем с сервером
+            await this.syncWithServer();
+            
             if (machine) {
                 this.logActivity(`Удален станок: ${machine.name}`);
             }
             this.showNotification('Станок успешно удален!');
             this.loadMachines();
         }
+    }
+
+    // Новая функция для синхронизации с сервером
+    syncWithServer = async () => {
+        try {
+            const allData = this.db.getAll();
+            const response = await fetch(`${window.location.origin}/api/sync`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(allData)
+            });
+            
+            if (response.ok) {
+                console.log('✅ Данные админки синхронизированы с сервером');
+                return true;
+            }
+        } catch (error) {
+            console.log('⚠️ Не удалось синхронизировать данные админки с сервером');
+        }
+        return false;
     }
 
     logActivity = (action, details = {}) => {

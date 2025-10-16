@@ -1,4 +1,3 @@
-// script.js - Версия с оптимизацией для мобильных устройств
 const API_BASE = `${window.location.origin}/api`;
 let tools = [];
 let isConnected = true;
@@ -30,20 +29,32 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeApp() {
-    await loadDataFromServer();
-    setupEventListeners();
-    
-    // Для мобильных устройств используем только ручное обновление
-    if (!isMobileDevice) {
-        startRealTimeSync();
+    try {
+        // Ждем инициализации базы данных
+        if (typeof window.toolDatabase === 'undefined') {
+            console.error('База данных не инициализирована');
+            showNotification('Ошибка инициализации базы данных', true);
+            return;
+        }
+        
+        await loadDataFromServer();
+        setupEventListeners();
+        
+        // Для мобильных устройств используем только ручное обновление
+        if (!isMobileDevice) {
+            startRealTimeSync();
+        }
+        
+        restoreFormState();
+        updateConnectionInfo();
+        updateInterface();
+        
+        // Обновляем звезды GitHub
+        updateGitHubStars();
+    } catch (error) {
+        console.error('Ошибка инициализации приложения:', error);
+        showNotification('Ошибка загрузки приложения', true);
     }
-    
-    restoreFormState();
-    updateConnectionInfo();
-    updateInterface();
-    
-    // Обновляем звезды GitHub
-    updateGitHubStars();
 }
 
 function setupEventListeners() {
@@ -824,6 +835,21 @@ function showNotification(message, isError = false) {
     setTimeout(() => {
         notification.style.display = 'none';
     }, 2000);
+}
+
+function loadLocalData() {
+    try {
+        if (typeof window.toolDatabase !== 'undefined' && window.toolDatabase.getTools) {
+            tools = window.toolDatabase.getTools();
+            updateInterface();
+        } else {
+            console.error('База данных не доступна');
+            showNotification('Ошибка загрузки локальных данных', true);
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки локальных данных:', error);
+        showNotification('Ошибка загрузки данных', true);
+    }
 }
 
 // Функция для получения количества звезд GitHub

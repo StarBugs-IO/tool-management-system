@@ -256,45 +256,45 @@ class ToolHandler(http.server.SimpleHTTPRequestHandler):
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
                 sync_data = json.loads(post_data.decode())
+    
+            with data_lock:
+            # КЛИЕНТСКИЕ ДАННЫЕ ИМЕЮТ ПРИОРИТЕТ - полностью заменяем серверные данные
+                if 'tools' in sync_data:
+                    tools_data = sync_data['tools']
+            
+            # Добавляем запись об изменении при синхронизации
+            last_changes.append({
+                'type': 'sync',
+                'tools_count': len(tools_data),
+                'timestamp': time.time()
+            })
+            # Ограничиваем историю изменений
+            if len(last_changes) > 100:
+                last_changes.pop(0)
                 
-                with data_lock:
-                    # КЛИЕНТСКИЕ ДАННЫЕ ИМЕЮТ ПРИОРИТЕТ - полностью заменяем серверные данные
-                    if 'tools' in sync_data:
-                        tools_data = sync_data['tools']
-                        
-                        # Добавляем запись об изменении при синхронизации
-                        last_changes.append({
-                            'type': 'sync',
-                            'tools_count': len(tools_data),
-                            'timestamp': time.time()
-                        })
-                        # Ограничиваем историю изменений
-                        if len(last_changes) > 100:
-                            last_changes.pop(0)
-                            
-                        save_data()
-                    
-                    if 'machines' in sync_data:
-                        save_machines_data(sync_data['machines'])
-                    
-                    if 'toolTypes' in sync_data:
-                        save_tooltypes_data(sync_data['toolTypes'])
-                
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps({
-                    'status': 'synced', 
-                    'tools_count': len(tools_data),
-                    'timestamp': time.time()
-                }).encode())
-                return
-                
+            save_data()
+        
+            if 'machines' in sync_data:
+                save_machines_data(sync_data['machines'])
+        
+            if 'toolTypes' in sync_data:
+                save_tooltypes_data(sync_data['toolTypes'])
+    
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                'status': 'synced', 
+                'tools_count': len(tools_data),
+                'timestamp': time.time()
+            }).encode())
+            return
+    
         except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
             pass
         except Exception as e:
-            print(f"❌ Ошибка в POST {self.path}: {e}")
+                print(f"❌ Ошибка в POST {self.path}: {e}")
             
     def do_OPTIONS(self):
         self.send_response(200)
