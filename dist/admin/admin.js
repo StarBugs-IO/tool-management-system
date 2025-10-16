@@ -1,7 +1,8 @@
-// admin.js - Упрощенная рабочая версия с синхронизацией
+// admin.js - Упрощенная рабочая версия
 class AdminPanel {
     constructor() {
         this.db = this.getDatabase();
+        this.activityLogger = this.getActivityLogger();
         this.editingMachine = null;
         this.editingToolType = null;
         
@@ -13,7 +14,6 @@ class AdminPanel {
         }
     }
 
-    // Используем стрелочные функции для автоматической привязки this
     getDatabase = () => {
         if (typeof window.toolDatabase !== 'undefined') {
             return window.toolDatabase;
@@ -44,6 +44,20 @@ class AdminPanel {
         };
     }
 
+    getActivityLogger = () => {
+        if (typeof window.activityLogger !== 'undefined') {
+            return window.activityLogger;
+        } else {
+            console.warn('ActivityLogger не найден, используем временный');
+            return {
+                logActivity: (action, details) => {
+                    console.log('📝 Действие:', action);
+                },
+                getRecentActivities: () => []
+            };
+        }
+    }
+
     updateGitHubStars = async () => {
         try {
             const response = await fetch('https://api.github.com/repos/StarBugs-IO/tool-management-system');
@@ -61,7 +75,7 @@ class AdminPanel {
     }
 
     init = async () => {
-        console.log('Инициализация админ-панели...');
+        console.log('🔄 Инициализация админ-панели...');
         
         try {
             // Загружаем данные с сервера
@@ -76,9 +90,9 @@ class AdminPanel {
             this.loadToolTypes();
             
             this.logActivity('Админ-панель запущена');
-            console.log('Админ-панель успешно инициализирована');
+            console.log('✅ Админ-панель успешно инициализирована');
         } catch (error) {
-            console.error('Ошибка инициализации админ-панели:', error);
+            console.error('❌ Ошибка инициализации админ-панели:', error);
         }
     }
 
@@ -87,49 +101,28 @@ class AdminPanel {
             const response = await fetch(`${window.location.origin}/api/full-data`);
             if (response.ok) {
                 const serverData = await response.json();
+                console.log('📥 Данные с сервера:', serverData);
                 
                 // Обновляем локальную базу данными с сервера
-                if (serverData.machines && serverData.machines.length > 0) {
+                if (serverData.tools) {
+                    this.db.saveTools(serverData.tools);
+                }
+                if (serverData.machines) {
                     this.db.saveMachines(serverData.machines);
                 }
-                
-                if (serverData.toolTypes && Object.keys(serverData.toolTypes).length > 0) {
+                if (serverData.toolTypes) {
                     this.db.saveToolTypes(serverData.toolTypes);
                 }
                 
                 console.log('✅ Данные админки загружены с сервера');
             }
         } catch (error) {
-            console.log('⚠️ Не удалось загрузить данные админки с сервера');
-        }
-    }
-
-    syncWithServer = async () => {
-        try {
-            const allData = {
-                machines: this.db.getMachines(),
-                toolTypes: this.db.getToolTypes(),
-                tools: this.db.getTools()
-            };
-            
-            const response = await fetch(`${window.location.origin}/api/sync`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(allData)
-            });
-            
-            if (response.ok) {
-                console.log('✅ Настройки синхронизированы с сервером');
-            }
-        } catch (error) {
-            console.log('⚠️ Сервер недоступен для синхронизации настроек');
+            console.log('⚠️ Не удалось загрузить данные админки с сервера, работаем локально');
         }
     }
 
     setupBasicEventListeners = () => {
-        console.log('Настройка базовых обработчиков...');
+        console.log('🔧 Настройка обработчиков...');
         
         // Навигация
         const menuLinks = document.querySelectorAll('.admin-menu a');
@@ -163,6 +156,8 @@ class AdminPanel {
     }
 
     showSection = (sectionId) => {
+        console.log('📂 Переход в раздел:', sectionId);
+        
         // Скрываем все разделы
         const sections = document.querySelectorAll('.admin-section');
         sections.forEach(section => {
@@ -199,8 +194,13 @@ class AdminPanel {
     }
 
     loadDashboard = () => {
+        console.log('📊 Загрузка дашборда...');
+        
         const tools = this.db.getTools();
         const machines = this.db.getMachines();
+        
+        console.log('🔧 Инструменты:', tools);
+        console.log('🏭 Станки:', machines);
         
         const totalTools = tools.length;
         const occupiedCells = new Set(
@@ -208,34 +208,48 @@ class AdminPanel {
         ).size;
         
         const activeMachines = machines.filter(m => m.status === 'active').length;
-        const totalCells = machines.reduce((sum, machine) => sum + machine.cells, 0);
+        const totalCells = machines.reduce((sum, machine) => sum + (machine.cells || 0), 0);
         const freeCells = totalCells - occupiedCells;
 
-        // Обновляем статистику если элементы существуют
-        this.safeUpdateElement('totalTools', totalTools);
-        this.safeUpdateElement('occupiedCells', occupiedCells);
-        this.safeUpdateElement('activeMachines', activeMachines);
-        this.safeUpdateElement('freeCells', freeCells);
+        console.log('📈 Статистика:', {
+            totalTools,
+            occupiedCells,
+            activeMachines,
+            totalCells,
+            freeCells
+        });
+
+        // Обновляем статистику
+        this.updateElement('totalTools', totalTools);
+        this.updateElement('occupiedCells', occupiedCells);
+        this.updateElement('activeMachines', activeMachines);
+        this.updateElement('freeCells', freeCells);
 
         this.loadRecentActivity();
     }
 
-    safeUpdateElement = (elementId, value) => {
+    updateElement = (elementId, value) => {
         const element = document.getElementById(elementId);
         if (element) {
             element.textContent = value;
+            console.log(`✅ Обновлен ${elementId}: ${value}`);
+        } else {
+            console.warn(`❌ Элемент ${elementId} не найден`);
         }
     }
 
     loadRecentActivity = () => {
         const activityList = document.getElementById('recentActivity');
-        if (!activityList) return;
+        if (!activityList) {
+            console.warn('❌ Элемент recentActivity не найден');
+            return;
+        }
         
-        const activityLog = this.db.getActivityLog();
+        const recentActivities = this.activityLogger.getRecentActivities(5);
+        console.log('📝 Последние действия:', recentActivities);
+        
         activityList.innerHTML = '';
 
-        const recentActivities = activityLog.slice(-5).reverse();
-        
         if (recentActivities.length === 0) {
             activityList.innerHTML = '<div class="activity-item">Нет недавних действий</div>';
             return;
@@ -262,6 +276,8 @@ class AdminPanel {
         }
         
         const machines = this.db.getMachines();
+        console.log('🏭 Загрузка станков:', machines);
+        
         machinesList.innerHTML = '';
 
         if (machines.length === 0) {
@@ -286,19 +302,6 @@ class AdminPanel {
         });
     }
 
-    createMachinesSection = () => {
-        // Создаем раздел станков если его нет
-        const machinesSection = document.getElementById('machines');
-        if (!machinesSection) return;
-        
-        const machinesList = document.createElement('div');
-        machinesList.id = 'machinesList';
-        machinesList.className = 'items-list';
-        machinesSection.appendChild(machinesList);
-        
-        this.loadMachines();
-    }
-
     loadToolTypes = () => {
         const toolTypesList = document.getElementById('toolTypesList');
         if (!toolTypesList) {
@@ -308,6 +311,8 @@ class AdminPanel {
         }
         
         const toolTypes = this.db.getToolTypes();
+        console.log('🔧 Загрузка типов инструментов:', toolTypes);
+        
         toolTypesList.innerHTML = '';
 
         const toolTypeKeys = Object.keys(toolTypes);
@@ -361,19 +366,7 @@ class AdminPanel {
         });
     }
 
-    createToolTypesSection = () => {
-        // Создаем раздел типов инструментов если его нет
-        const toolsSection = document.getElementById('tools');
-        if (!toolsSection) return;
-        
-        const toolTypesList = document.createElement('div');
-        toolTypesList.id = 'toolTypesList';
-        toolTypesList.className = 'items-list';
-        toolsSection.appendChild(toolTypesList);
-        
-        this.loadToolTypes();
-    }
-
+    // Остальные функции остаются без изменений...
     getStatusBadge = (status) => {
         const badges = {
             'active': '🟢 Активный',
@@ -404,9 +397,6 @@ class AdminPanel {
         machines.push(newMachine);
         this.db.saveMachines(machines);
         
-        // Синхронизируем с сервером
-        await this.syncWithServer();
-        
         this.logActivity(`Добавлен станок: ${name}`);
         this.showNotification('Станок успешно добавлен!');
         this.closeModal('addMachineModal');
@@ -434,9 +424,6 @@ class AdminPanel {
         // Создаем новый тип с пустым массивом размеров
         toolTypes[name] = [];
         this.db.saveToolTypes(toolTypes);
-        
-        // Синхронизируем с сервером
-        await this.syncWithServer();
         
         this.logActivity(`Добавлен тип инструмента: ${name}`);
         this.showNotification('Тип инструмента успешно добавлен!');
@@ -469,9 +456,6 @@ class AdminPanel {
         
         // Обновляем все инструменты, которые используют старый тип
         this.updateToolsWithNewTypeName(oldName, newName);
-        
-        // Синхронизируем с сервером
-        this.syncWithServer();
         
         this.logActivity(`Переименован тип инструмента: "${oldName}" → "${newName}"`);
         this.showNotification('Тип инструмента успешно переименован!');
@@ -515,9 +499,6 @@ class AdminPanel {
             
             this.db.saveToolTypes(toolTypes);
             
-            // Синхронизируем с сервером
-            await this.syncWithServer();
-            
             this.logActivity(`Удален тип инструмента: ${toolType}`);
             this.showNotification('Тип инструмента успешно удален!');
             this.loadToolTypes();
@@ -541,9 +522,6 @@ class AdminPanel {
             
             this.db.saveMachines(updatedMachines);
             
-            // Синхронизируем с сервером
-            await this.syncWithServer();
-            
             if (machine) {
                 this.logActivity(`Удален станок: ${machine.name}`);
             }
@@ -552,8 +530,27 @@ class AdminPanel {
         }
     }
 
-    logActivity = (action) => {
-        this.db.addActivity(action);
+    logActivity = (action, details = {}) => {
+        this.activityLogger.logActivity(action, details);
+    }
+
+    showNotification = (message, isError = false) => {
+        // Создаем или находим уведомление
+        let notification = document.getElementById('adminNotification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'adminNotification';
+            notification.className = 'notification';
+            document.body.appendChild(notification);
+        }
+        
+        notification.textContent = message;
+        notification.className = isError ? 'notification error' : 'notification';
+        notification.style.display = 'block';
+
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
     }
 
     showModal = (modalId) => {
@@ -578,23 +575,28 @@ class AdminPanel {
         }
     }
 
-    showNotification = (message, isError = false) => {
-        // Создаем или находим уведомление
-        let notification = document.getElementById('adminNotification');
-        if (!notification) {
-            notification = document.createElement('div');
-            notification.id = 'adminNotification';
-            notification.className = 'notification';
-            document.body.appendChild(notification);
-        }
+    createMachinesSection = () => {
+        const machinesSection = document.getElementById('machines');
+        if (!machinesSection) return;
         
-        notification.textContent = message;
-        notification.className = isError ? 'notification error' : 'notification';
-        notification.style.display = 'block';
+        const machinesList = document.createElement('div');
+        machinesList.id = 'machinesList';
+        machinesList.className = 'items-list';
+        machinesSection.appendChild(machinesList);
+        
+        this.loadMachines();
+    }
 
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 3000);
+    createToolTypesSection = () => {
+        const toolsSection = document.getElementById('tools');
+        if (!toolsSection) return;
+        
+        const toolTypesList = document.createElement('div');
+        toolTypesList.id = 'toolTypesList';
+        toolTypesList.className = 'items-list';
+        toolsSection.appendChild(toolTypesList);
+        
+        this.loadToolTypes();
     }
 }
 

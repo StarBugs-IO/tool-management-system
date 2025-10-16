@@ -600,6 +600,77 @@ textarea {
     font-family: 'Courier New', monospace;
 }
 
+/* Стили для логов */
+.logs-stats {
+    background: #f8f8f8;
+    border: 1px solid #333333;
+    padding: 15px;
+    margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
+}
+
+.logs-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.logs-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #333333;
+}
+
+.logs-list {
+    padding: 10px;
+}
+
+.log-item {
+    background: #f8f8f8;
+    border: 1px solid #cccccc;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.log-time {
+    color: #666666;
+    font-size: 0.8em;
+    margin-bottom: 4px;
+}
+
+.log-action {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.log-details {
+    background: #e8e8e8;
+    padding: 5px;
+    margin: 4px 0;
+    font-size: 0.8em;
+    word-break: break-all;
+}
+
+.log-id {
+    color: #888888;
+    font-size: 0.7em;
+    text-align: right;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .logs-actions {
+        flex-direction: column;
+    }
+    
+    .logs-actions button {
+        width: 100%;
+    }
+}
+
 /* Футер в стиле главной страницы */
 .admin-footer {
     margin-top: 40px;

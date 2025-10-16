@@ -22,33 +22,39 @@
         <!-- Основной контент -->
         <main class="admin-content">
             <!-- Раздел Дашборд -->
-            <div id="dashboard" class="admin-section active">
-                <h1>📊 Дашборд</h1>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Всего инструментов</h3>
-                        <span class="stat-number" id="totalTools">0</span>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Занято ячеек</h3>
-                        <span class="stat-number" id="occupiedCells">0</span>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Активных станков</h3>
-                        <span class="stat-number" id="activeMachines">0</span>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Свободных ячеек</h3>
-                        <span class="stat-number" id="freeCells">0</span>
-                    </div>
-                </div>
+            <!-- ВЕРНУТЬ оригинальный раздел дашборда -->
+<div id="dashboard" class="admin-section active">
+    <h1>📊 Дашборд</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Всего инструментов</h3>
+            <span class="stat-number" id="totalTools">0</span>
+        </div>
+        <div class="stat-card">
+            <h3>Занято ячеек</h3>
+            <span class="stat-number" id="occupiedCells">0</span>
+        </div>
+        <div class="stat-card">
+            <h3>Активных станков</h3>
+            <span class="stat-number" id="activeMachines">0</span>
+        </div>
+        <div class="stat-card">
+            <h3>Свободных ячеек</h3>
+            <span class="stat-number" id="freeCells">0</span>
+        </div>
+    </div>
 
-                <div class="recent-activity">
-                    <h3>Последние действия</h3>
-                    <div id="recentActivity" class="activity-list">
-                        <!-- Активность будет загружена через JS -->
-                    </div>
-                </div>
+    <!-- ВЕРНУТЬ блок последних действий -->
+    <div class="recent-activity">
+        <h3>Последние действия</h3>
+        <div id="recentActivity" class="activity-list">
+            <!-- Активность будет загружена через JS -->
+        </div>
+    </div>
+</div>
+
+
             </div>
 
             <!-- Раздел Станки -->
@@ -130,8 +136,9 @@
     </div>
 </div>
 
-    <!-- Подключаем database.js ПЕРВЫМ -->
-    <script src="../database.js"></script>
-    <script src="admin.js"></script>
+  <!-- Подключаем database.js ПЕРВЫМ -->
+<script src="../database.js"></script>
+<script src="../activity-logger.js"></script>
+<script src="admin.js"></script>
 </body>
 </html>
