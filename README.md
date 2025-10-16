@@ -1,4 +1,4 @@
-# 🛠️ Tool Management System - BETA v1.0
+# 🛠️ Tool Management System - pre-Release 1.2.7
 
 <p align="center">
       <a href="https://yoomoney.ru/to/4100119366416023">
