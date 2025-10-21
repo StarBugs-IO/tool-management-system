@@ -65,6 +65,7 @@ git clone https://github.com/starbugs-io/tool-management-system.git
 cd tool-management-system
 ```
 
+
 ### Шаг 3: Запустите сервер
 ```bash
 # Для Windows
